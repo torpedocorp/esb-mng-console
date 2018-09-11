@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+
+<!-- ======================================================================= -->
+<!-- BizFrame Ant Builder                                                    -->
+<!-- author Youngjun Bae											         -->
+<!-- ======================================================================= -->
+
+<project name="bizframe-apim" default="deploy" basedir=".">
+	<property environment="env"/>
+
+	<property file="./build.properties"/>
+	<property name="product.name" value="bizframe-esb-management-console"/>
+	<property name="product.version" value="1.0"/>
+	<property name="year" value="2018"/>
+
+	<property name="jar.name" value="${product.name}-${product.version}.jar"/>
+	<property name="pkg.dir" value="kr/co/bizframe/esb/mng"/>
+
+	<!-- =================================================================== -->
+	<!-- Build classpath 													 -->
+	<!-- =================================================================== -->
+	<path id="classpath">
+		<fileset dir="${basedir}/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="web/WEB-INF/lib/">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${spring.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${camel.monitoring.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${mas.cmd.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	<property name="build.classpath" refid="classpath"/>
+
+	<!-- =================================================================== -->
+	<!-- Init the build system                                               -->
+	<!-- =================================================================== -->
+	<target name="init">
+		<echo message=""/>
+		<echo message="------------------------------------------------------------------"/>
+		<echo message="----- ${product.name} v${product.version} [${year}] -----"/>
+		<echo message="------------------------------------------------------------------"/>
+		<echo message="Building with ${ant.version}"/>
+		<echo message="Java ${java.version} located at ${java.home} "/>
+		<echo message="------------------------------------------------------------------"/>
+		<echo message=""/>
+	</target>
+	<!-- =================================================================== -->
+	<!-- Prepares the build directory                                        -->
+	<!-- =================================================================== -->
+	<target name="prepare" depends="init">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${deploy.dir}"/>
+		<mkdir dir="${classes.dir}"/>
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Compiles the source code                                            -->
+	<!-- =================================================================== -->
+	<target name="compile">
+		<javac srcdir="${src.dir}"
+			destdir="${classes.dir}"
+			debug="on"
+			deprecation="on"
+			optimize="off"
+			classpath="${build.classpath}">
+		</javac>
+		<!--<buildnumber/>-->
+
+		<echo message="SRC-DIR ... ${src.dir}"/>
+		<echo message="TO -DIR ... ${build.dir}"/>
+
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Create jar file for deployment										 -->
+	<!-- =================================================================== -->
+	<target name="deploy" depends="clean, compile">
+
+		<jar jarfile="${deploy.dir}/${jar.name}">
+			<fileset dir="${classes.dir}">
+				<!-- ======================================================= -->
+				<!-- TO SET : List class filenames to delete here -->
+				<!-- ======================================================= -->
+				<include name="**/*.class"/>
+			</fileset>
+			<manifest>
+				<attribute name="Created-By" value="Torpedo Corporation"/>
+				<attribute name="Compiled-By" value="jdk-${java.version}"/>
+				<section name="BizFrame ESB Management Console">
+					<attribute name="Implementation-Title" value="${product.name}"/>
+					<attribute name="Implementation-Version" value="${product.version} build ${DSTAMP} ${TSTAMP}"/>
+					<attribute name="Implementation-Vendor" value="Torpedo Corporation"/>
+				</section>
+			</manifest>
+		</jar>
+		<copy file="${deploy.dir}/${jar.name}" todir="web/WEB-INF/lib" />
+		<copy todir="web/WEB-INF/classes">
+			<fileset dir="${resources.dir}">
+				<include name="**/*.*" />
+				<exclude name="META-INF/**/*.*" />
+			</fileset>
+		</copy>
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Cleans up generated stuff                                           -->
+	<!-- =================================================================== -->
+	<target name="clean" depends="prepare">
+		<delete>
+			<fileset dir="${classes.dir}">
+				<!-- ======================================================= -->
+				<!-- TO SET : List class filenames to delete here 			 -->
+				<!-- ======================================================= -->
+				<include name="**/*.class"/>
+			</fileset>
+		</delete>
+	</target>
+</project>
