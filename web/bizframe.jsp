@@ -28,6 +28,17 @@ int monitorInterval = webUtils.getMonitorInterval();
 	<script type="text/javascript" src="js/default.js"></script>
     <script src="js/highlight/highlight.js"></script>
     <script src="js/login.js"></script>
+	<style type="text/css">
+	    #mynetwork {
+	      width: 100%;
+	      height: 700px;
+	      border: 0px solid lightgray;
+	    }
+	    .trace-msg-dialog {
+		  width: 800px;
+		}
+			    
+	</style>
 <script>
 // 로그인된 상태이나 클라이언트 세션 스토리지에 권한 정보가 없을 때 클라이언트 세션 스토리지에 권한 데이터를 넣어줌
 <%String sessionStatus = (String)session.getAttribute(Constants.SESSION_STATUS);%>;

@@ -53,7 +53,6 @@ public class AgentDao {
 	public void update(Agent agent) {
 		Session session = sessionFactory.getCurrentSession();
 		session.update(agent.getAgentId(), agent);
-		logger.debug("===========" + get(agent.getAgentId()));
 	}
 
 	public void delete(String id) {

@@ -66,9 +66,9 @@ public class AgentController {
 	}
 
 	/*---Delete a agent by id---*/
-	@DeleteMapping("/agent/{id}")
-	public ResponseEntity<?> delete(@PathVariable("id") String id) {
-		agentService.delete(id);
+	@DeleteMapping("/agent/{agentId}/{routeId}")
+	public ResponseEntity<?> delete(@PathVariable("agentId") String agentId, @PathVariable("routeId") String routeId) {
+		agentService.delete(agentId, routeId);
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put("result", 1);
 		return ResponseEntity.ok().body(response);

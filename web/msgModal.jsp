@@ -1,38 +1,51 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>
         <div id="msgModal" class="uk-modal" aria-hidden="true" style="display: none; overflow-y: scroll;">
- 			<div class="uk-modal-dialog">
-			<button type="button" class="uk-modal-close uk-close"></button>
+ 			<div class="uk-modal-dialog trace-msg-dialog uk-overflow-auto">
+				<button type="button" class="uk-modal-close uk-close"></button>
 				<div class="uk-modal-header">
 					<div id="exchangeIdDiv"><h2></h2></div>
 				</div>
-				<table>
+				<table class="uk-table">
                		<tr>
-               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">routeId</span></td>
-               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="routeIdDiv"></div></td>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">RouteId</span></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="routeIdDiv" style="word-break:break-all;"></div></td>
                		</tr>
                		<tr>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">To Node</span></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="toNodeDiv" style="word-break:break-all;"></div></td>
+               		</tr>
+               		<tr>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">PreviousNode</span></td>
+               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="previousNodeDiv" style="word-break:break-all;"></div></td>
+               		</tr>               		
+               		<!-- <tr>
                			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">exchangePattern</span></td>
                			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="exchangePatternDiv"></div></td>
-               		</tr>
+               		</tr> -->
                		<tr>
                			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">Exception</span></td>
-               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="exceptionDiv"></div></td>
+               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="exceptionDiv" style="word-break:break-all;"></div></td>
                		</tr>
                		<tr>
-               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">headers</span></td>
-               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="headersDiv"></div></td>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">Headers</span></td>
+               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="headersDiv" style="word-break:break-all;"></div></td>
                		</tr>
                		<tr>
                			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">Body</span></td>
-               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="bodyDiv"></div></td>
-               		</tr> 
+               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="bodyDiv" style="word-break:break-all;"></div></td>
+               		</tr>
                		<tr>
-               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">PreviousNode</span></td>
-               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="previousNodeDiv"></div></td>
-               		</tr>             		
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">Out Headers</span></td>
+               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="outheadersDiv" style="word-break:break-all;"></div></td>
+               		</tr>
+               		<tr>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">Out Body</span></td>
+               			<td style="padding-left:10px;padding-top:15px;text-align:left; border-bottom : 0px;"><div id="outbodyDiv" style="word-break:break-all;"></div></td>
+               		</tr>
+             		
 				</table>
 				<div class="uk-modal-footer uk-text-right">
-					<button type="button" class="uk-button uk-button-primary" onclick=javascript:UIkit.modal("#msgModal").hide();>Close</button>
+					<button type="button" class="uk-button uk-button-primary" onclick='javascript:UIkit.modal("#msgModal").hide();'>Close</button>
 				</div>
 			</div>
 		</div>
@@ -52,17 +65,21 @@
 		}
 		
 		function getMessage(info, res) {
-			hideLoading();
-			$("#routeIdDiv").html(res.routeId);
-			$("#exchangeIdDiv").html(res.exchangeId);
-			$("#exchangePatternDiv").html(res.exchangePattern);
+			hideLoading();			
+			$("#routeIdDiv").html(res.routeId + ", " + res.fromEndpointUri);
+			$("#toNodeDiv").html(res.toNode + ' ('+res.traceInOut.toUpperCase()+') ');
+			$("#exchangeIdDiv").html('<h2>' + res.exchangeId + '</h2>');
+			//$("#exchangePatternDiv").html(res.exchangePattern);
 			var err = res.causedByException;
 			if (err == null) {
 				err = "";
 			}
 			$("#exceptionDiv").html('<font color="red">' + err + '</font>');			
 			$("#headersDiv").html(res.headers);
-			$("#bodyDiv").html('<a href="#" onclick=viewBody("'+encodeURIComponent(res.body)+'")>' + res.body + '</a>');
+			$("#bodyDiv").html(res.body);
+			
+			$("#outheadersDiv").html(res.outHeaders);
+			$("#outbodyDiv").html(res.outBody);
 			
 			var pevNode = res.previousNode;
 			if (pevNode == null) {

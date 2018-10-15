@@ -39,23 +39,23 @@
 				callback: "showDatas",
 				displayId: "list",
 				pagelist: true,
-				fieldWidths: [15,25,15,15,15,15], //%
-				fields: ["AgentId", "ExchangeId", "등록 일", "RouteId", "From", "To"],
-				align:["left", "left", "left","left", "left", "left"],
-				jsonKey: ["agentId","exchangeId", "timestamp", "routeId", "fromEndpointUri", "toNode"],
+				fieldWidths: [15,20,10,6,15,13,21], //%
+				fields: ["AgentId", "ExchangeId", "To Node", "InOut", "등록 일", "RouteId", "From Endpoint"],
+				align:["left", "left", "left","left", "left", "left", "left"],
+				jsonKey: ["agentId","exchangeId", "toNode", "traceInOut", "timestamp", "routeId", "fromEndpointUri"],
 				detailMethod : "showMessage",
 				detailLinkArgs : "id",
 				detailLinkTarget : "exchangeId",
-				colspan:6
+				colspan:7
 		};
 		
 		$(function () {
 			var html='<select style="border:1px solid #E5E5E5;" id="searchKey" name="searchKey">';
-			html +='<option value=""></option>';
+			html +='<option value="">Search Field</option>';
 			html +='<option value="exchangeId">ExchangeId</option>';
 			html +='<option value="routeId">RouteId</option>';
-			html +='<option value="fromEndpointUri">From</option>';
-			html +='<option value="toNode">To</option>';
+			html +='<option value="fromEndpointUri">From Endpoint</option>';
+			html +='<option value="toNode">To Node</option>';
 			html +='</select>&nbsp;&nbsp;&nbsp;';
 			
 			$("#searchKeyDiv").html(html);
@@ -72,7 +72,11 @@
 			for ( var i = 0; i < res.messages.length; i++) {
 				var ts = res.messages[i].timestamp;
 				res.messages[i].timestamp = new Date(ts).format('yyyy-MM-dd HH:mm:ss');
+				res.messages[i].traceInOut = res.messages[i].traceInOut.toUpperCase();
+				res.messages[i].fromEndpointUri = '<div style="word-break:break-all;">' + res.messages[i].fromEndpointUri + '</div>';
+				
 			}
+			
 			showListJson(trInfo, res);
 		}
 

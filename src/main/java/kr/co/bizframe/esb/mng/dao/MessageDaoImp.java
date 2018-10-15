@@ -146,7 +146,7 @@ public class MessageDaoImp implements MessageDao {
 
 			cq.where(pd);
 			cq.select(root);
-			cq.orderBy(cb.desc(root.get("timestamp")));
+			cq.orderBy(cb.asc(root.get("timestamp")));
 			Query<TraceMessage> query = session.createQuery(cq);
 			return query.getResultList();
 

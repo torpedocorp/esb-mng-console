@@ -24,10 +24,11 @@
 								<option value="">Group By</option>
 								<option value="agentId">AgentId</option>
 								<option value="routeId">RouteId</option>
-								<option value="success">Status</option>
+								<option value="success">Success</option>
 								</select>
 								&nbsp;&nbsp;&nbsp;&nbsp;
 								<i class="uk-icon-search" onclick="javascript:search(1)"></i>
+								<input class="uk-search-field" type="search" placeholder="search..." autocomplete="on" id="strSearch" name="strSearch">
 							</div>
 							<br>
 						<div id="list"></div><br>
@@ -82,7 +83,7 @@
 			
 			var dateGroupbyKeys = _.sortBy(_.keys(dateGroupby), function (key) {
 		       return key;
-		    });
+		    }).reverse();
 			
 			//var arr = jQuery.makeArray(dateGroupby);
 			var list = [];
@@ -100,23 +101,13 @@
 					} else {
 						m.success = "";
 					}
+					if (i > 0) {
+						m.createDate = "";	
+					}
+					i++;
 					list.push(m);
 				});	
 			});
-			
-			/* for (var i = 0; i < res.messages.length; i++) {
-				var searchKey = $("#searchKey").val();
-				if (searchKey == "" || searchKey == "success") {
-					var result = res.messages[i].success;
-					if (result == true) {
-						res.messages[i].success = '<i class="uk-icon-check-circle" style="font-size:20px;color:#4B8A08;"></i>';
-					} else {
-						res.messages[i].success = '<i class="uk-icon-exclamation-triangle" style="font-size:18px;color:#DF3A01;"></i>';
-					}
-				} else {
-					res.messages[i].success = "";
-				}
-			} */
 			res.messages = list;
 			showListJson(trInfo, res);
 		}

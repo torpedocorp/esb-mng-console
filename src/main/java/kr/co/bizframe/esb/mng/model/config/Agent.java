@@ -95,8 +95,7 @@ public class Agent {
 		if (toList == null) {
 			routeToList = new HashMap<>();
 		} else {
-			Type listType = new TypeToken<Map<String, List<String>>>() {
-			}.getType();
+			Type listType = new TypeToken<Map<String, List<String>>>() {}.getType();
 			routeToList = gson.fromJson(toList, listType);
 		}
 		return routeToList;

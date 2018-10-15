@@ -3,14 +3,7 @@
 <!DOCTYPE html>
 <html lang="kr" dir="ltr" class="uk-height-1-1">
 <%@ include file="bizframe.jsp"%>
-    <body class="tm-background">
-	    <style type="text/css">
-		    #mynetwork {
-		      width: 100%;
-		      height: 600px;
-		      border: 0px solid lightgray;
-		    }
-	  	</style>       		
+    <body class="tm-background">	           		
 		<%@ include file="header.jsp"%>
         <div class="tm-middle">		
 			<div class="uk-container uk-container-center">
@@ -183,8 +176,12 @@
 					    	 if (nodeRouteData) {					    		
 					    		 sttInfo = nodeRouteData.total + " ("+nodeRouteData.success+" / "+nodeRouteData.fail+")";
 					    	 }
+					    	 var label = agent.agentId;
+					    	 if (agent.label) {
+					    		 label = agent.label;
+					    	 }
 					    	 groupIds.push = agent.agentId;
-					    	 nodes.push({id: nodeId, group: agent.agentId, font: { multi: 'html', size: 20, color:color }, label: '<b>'+agent.label+'</b>\n<b><i>'+routeId+'</i></b>\n\n<i>'+sttInfo+'</i>'});
+					    	 nodes.push({id: nodeId, color: '#A9BCF5', group: agent.agentId, font: { multi: 'html', size: 15, color:color }, label: '<b>'+label+'</b>\n<b><i>'+routeId+'</i></b>\n\n<i>'+sttInfo+'</i>'});
 					    	 var toList = routeToList[routeId];
 					    	 if (toList) {		    		  
 						    	  for(var j=0; j < toList.length; j++) {						    		  
@@ -208,14 +205,25 @@
 		    function draw(info, res) {     
 		      
 		      hideLoading();
-		      
+		      var groupOpts = {};
+		      for (var i = 0; i < res.agents.length; i++) {
+		    	  var agent = res.agents[i];		    	  
+		    	  groupOpts[agent.agentId] ={color:'#A9D0F5'};
+		      }
+		      		      
 		      // create a network
 		      var container = document.getElementById('mynetwork');
 			  var options = {
 					    physics:{
-				          barnesHut:{gravitationalConstant:-8000}
+				          barnesHut:{gravitationalConstant:-2000}
 				        },
-				        layout: {randomSeed:0},
+				        //physics : false,
+				        /* layout: {randomSeed:0}, */
+				         "layout": {
+						    "hierarchical": {
+						      "enabled": false
+						    }
+						 },
 					    height: '100%',
 					    width: '100%',
 						edges : {
@@ -223,7 +231,9 @@
 								size : 12
 							}
 						},
+						groups: groupOpts,
 						nodes : {
+							widthConstraint: { minimum: 120, maximum: 120,},						   			
 							shape : 'box',
 							font : {
 								bold : {
@@ -233,7 +243,8 @@
 									color : '#170B3B',
 									size : 15
 								},
-							},							
+							},
+							size : 15,
 						}
 				};
 			  
@@ -308,7 +319,7 @@
 		    		title += '&nbsp;&nbsp;&nbsp;Last Updated : ' + new Date(res.lastUpdated).format('yyyy-MM-dd HH:mm:ss');
 		    	}
 		    	//title += '&nbsp;&nbsp;&nbsp;&nbsp;<i class="uk-icon-table" style="font-size:20px;" onclick="viewExchangeInfos(\''+res.agentId+'\',\''+selectRouteId+'\')"></i>';
-		    	title += '&nbsp;&nbsp;<i class="uk-icon-trash" style="font-size:20px;" onclick="deleteAgent(\''+nodeId+'\')"></i>';
+		    	title += '&nbsp;&nbsp;<i class="uk-icon-trash" style="font-size:20px;" onclick="deleteAgent(\''+res.agentId+'\', \''+selectRouteId+'\')"></i>';
 		    	
 		    	$("#mAgentIdDiv").html(title);
 		    	
@@ -380,12 +391,12 @@
 		    		return false;
 		    	}
 
-		    	value = $('#form1').find('#fromJolokiaUrl').val();
+		    	/* value = $('#form1').find('#fromJolokiaUrl').val();
 		    	if(value == null || value == '') {
 		    		hideLoading();
 		    		alertBox('From 모니터링 API Endpoint를 입력하세요.');
 		    		return false;
-		    	}
+		    	} */
 		    	
 		    	value = $('#form1').find('#fromRouteId').val();
 		    	if(value == null || value == '') {
@@ -404,12 +415,12 @@
 		    	value = $('#form1').find('#toAgentId').val();
 		    	if(value != null && value.length > 0) {
 		    		value = $('#form1').find('#toJolokiaUrl').val();
-			    	if(value == null || value == '') {
+			    	/* if(value == null || value == '') {
 			    		hideLoading();
 			    		alertBox('To 모니터링 API Endpoint를 입력하세요.');
 			    		return false;
 			    	}
-			    	
+			    	 */
 			    	value = $('#form1').find('#toRouteId').val();
 			    	if(value == null || value == '') {
 			    		hideLoading();
@@ -436,10 +447,10 @@
 		    	return icon;
 		    }
 
-		    function deleteAgent(nodeId) {
-		    	UIkit.modal.confirm(nodeId + ' 모니터링을 취소하시겠습니까?', function() { 
+		    function deleteAgent(agentId, routeId) {
+		    	UIkit.modal.confirm(agentId + ', '+routeId+' 모니터링을 취소하시겠습니까?', function() { 
 		    		var info = {
-			    			url : "/agent/" + nodeId,
+			    			url : "/agent/" + agentId +"/" + routeId,
 			    			dataType: "json",
 			    			method: "delete",
 							callback: "setResult",

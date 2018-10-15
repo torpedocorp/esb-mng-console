@@ -14,6 +14,15 @@ public class SearchOptions {
 	private String toDate;
 	private String agentId;
 	private String routeId;
+	private String id;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getAgentId() {
 		return agentId;

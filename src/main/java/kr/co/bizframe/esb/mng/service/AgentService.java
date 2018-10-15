@@ -260,6 +260,9 @@ public class AgentService {
 	}
 
 	private void initMonitoringAgent(final MonitoringData instance) {
+		if (trim(instance.getJolokiaUrl()) == null) {
+			return;
+		}
 		
 		ScheduledExecutorService instanceScheduler = Executors.newSingleThreadScheduledExecutor(
 				new MonitorThreadFactory(DEFAULT_EXECUTOR_SERVICE_NAME + "_" + instance.getAgentId() + "_MonitoringScheduler"));
@@ -336,7 +339,7 @@ public class AgentService {
 			instance.setLastUpdated(new Date());
 
 		} catch (Throwable e) {
-			logger.error("monitoringAgent appList " + instance.getAgentId() + ", url=" + url + " error " + e.getMessage(), e);
+			logger.error("monitoringAgent appList " + instance.getAgentId() + ", url=" + url + " error " + e.getMessage());
 		}
 
 		datas.put(instance.getAgentId(), instance);
@@ -426,7 +429,7 @@ public class AgentService {
 			}
 
 		} catch (Throwable e) {
-			logger.error("monitoringAgent url=" + url + " error " + e.getMessage(), e);
+			logger.error("monitoringAgent url=" + url + " error " + e.getMessage());
 			instance.setStatus("");
 			instance.getServiceStatus().clear();
 
@@ -544,8 +547,14 @@ public class AgentService {
 		Map<String, List<String>> fromRouteToList = from.getRouteToList();
 		
 		from.setAgentId(info.getFromAgentId());
-		from.setJolokiaUrl(info.getFromJolokiaUrl());
-		from.setLabel(info.getFromLabel());		 
+		if (trim(info.getFromJolokiaUrl()) != null) {
+			from.setJolokiaUrl(info.getFromJolokiaUrl());	
+		}
+		
+		if (trim(info.getFromLabel()) != null) {
+			from.setLabel(info.getFromLabel());	
+		}
+				 
 		List<String> fromToList = fromRouteToList.get(info.getFromRouteId());
 		if (fromToList == null) {
 			fromToList = new ArrayList<>();				
@@ -564,8 +573,14 @@ public class AgentService {
 			}
 			
 			to.setAgentId(info.getToAgentId());
-			to.setJolokiaUrl(info.getToJolokiaUrl());
-			to.setLabel(info.getToLabel());
+			if (trim(info.getToJolokiaUrl()) != null) {
+				to.setJolokiaUrl(info.getToJolokiaUrl());
+			}
+			
+			if (trim(info.getToLabel()) != null) {
+				to.setLabel(info.getToLabel());
+			}
+			
 			// agent.agentId + '_' + routeId
 			fromToList.add(getRoutePrimaryKey(info.getToAgentId(), info.getToRouteId()));
 		}
@@ -574,7 +589,7 @@ public class AgentService {
 		from.setToList(gson.toJson(fromRouteToList));
 		save(isFromInsert, from);
 		
-		if (to == null) {
+		if (to == null || from.getAgentId().equals(to.getAgentId())) {
 			return;
 		}
 		
@@ -614,15 +629,33 @@ public class AgentService {
 	}
 
 	@Transactional(transactionManager = CONFIG_DB_KEY + TRANSACTIONMANAGER_NAME)
-	public void delete(String id) {
-		agentDao.delete(id);
+	public void delete(String agentId, String routeId) {
+		Agent agent = get(agentId);
+		if (agent == null) {
+			return;
+		}
+
+		Map<String, List<String>> routeToList = agent.getRouteToList();
+		if (routeToList.containsKey(routeId)) {
+			routeToList.remove(routeId);
+		}
 
 		// refresh monitoring data
-		try {
-			removeAgentScheduler(id);
-			datas.remove(id);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
+		if (routeToList.size() == 0) {
+			agentDao.delete(agentId);
+			
+			try {
+				removeAgentScheduler(agentId);
+				datas.remove(agentId);
+			} catch (Throwable e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			Gson gson = new Gson();
+			agent.setToList(gson.toJson(routeToList));
+
+			agentDao.update(agent);
+
 		}
 	}
 

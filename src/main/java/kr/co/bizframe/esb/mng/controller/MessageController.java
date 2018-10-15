@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.co.bizframe.esb.mng.dao.ExchangeInfoDao;
 import kr.co.bizframe.esb.mng.model.PagingModel;
 import kr.co.bizframe.esb.mng.model.SearchOptions;
+import kr.co.bizframe.esb.mng.model.trace.ExchangeInfo;
 import kr.co.bizframe.esb.mng.model.trace.TraceMessage;
 import kr.co.bizframe.esb.mng.service.MessageService;
 
@@ -25,6 +27,9 @@ public class MessageController {
    @Autowired
    private MessageService messageService;
 
+	@Autowired
+	private ExchangeInfoDao exchangeInfoDao;
+	
    /*---Add new msg---*/
    @PostMapping("/msg")
    public ResponseEntity<?> save(@RequestBody TraceMessage msg) {
@@ -56,11 +61,13 @@ public class MessageController {
 	@PostMapping("/exchange/traces")
 	public ResponseEntity<Map<String, Object>> exchangelist(@RequestBody SearchOptions options) throws Throwable {
 		List<TraceMessage> vo = messageService.exchangeTraces(options);
+		ExchangeInfo exchange = exchangeInfoDao.get(options.getId());
 		if (vo == null) {
-			throw new Exception("/exchange/msgs api error ");
+			throw new Exception("/exchange/traces api error ");
 		}
 		Map<String, Object> jsonResponse = new HashMap<String, Object>();
 		jsonResponse.put("messages", vo);
+		jsonResponse.put("exchange", exchange);
 		return ResponseEntity.ok().body(jsonResponse);
 	}
 	

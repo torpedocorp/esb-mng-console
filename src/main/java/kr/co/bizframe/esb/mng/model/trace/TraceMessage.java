@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -18,8 +19,10 @@ import javax.persistence.TemporalType;
 		@Index(columnList = "FROMENDPOINTURI", name = "IDX_MESSAGETRACED_FROMENDPOINTURI"),
 		@Index(columnList = "TONODE", name = "IDX_MESSAGETRACED_TONODE"), })
 public class TraceMessage {
-
+	
+	@Id
 	private String id;
+	
 	private String agentId;
 	private Date timestamp;
 	private String fromEndpointUri;
@@ -28,13 +31,27 @@ public class TraceMessage {
 	private String exchangeId;
 	private String shortExchangeId;
 	private String exchangePattern;
+	
+	@Column(length = 32672)
 	private String properties;
+	
+	@Column(length = 32672)
 	private String headers;
+	
+	@Column(length = 32672)
 	private String body;
+	
 	private String bodyType;
+	
+	@Column(length = 32672)
 	private String outHeaders;
+	
+	@Column(length = 32672)
 	private String outBody;
+	
 	private String outBodyType;
+	
+	@Column(length = 32672)
 	private String causedByException;
 	private String routeId;
 	private String traceInOut;
@@ -58,7 +75,6 @@ public class TraceMessage {
 		this.agentId = agentId;
 	}
 
-	@Id
 	public String getId() {
 		return id;
 	}
@@ -124,8 +140,6 @@ public class TraceMessage {
 		this.exchangePattern = exchangePattern;
 	}
 
-	// @Lob
-	@Column(columnDefinition = "VARCHAR(32672)")
 	public String getProperties() {
 		return properties;
 	}
@@ -134,8 +148,6 @@ public class TraceMessage {
 		this.properties = properties;
 	}
 
-	// @Lob
-	@Column(columnDefinition = "VARCHAR(32672)")
 	public String getHeaders() {
 		return headers;
 	}
@@ -144,7 +156,6 @@ public class TraceMessage {
 		this.headers = headers;
 	}
 
-	// @Lob
 	public String getBody() {
 		return body;
 	}
@@ -161,7 +172,6 @@ public class TraceMessage {
 		this.bodyType = bodyType;
 	}
 
-	// @Lob
 	public String getOutBody() {
 		return outBody;
 	}
@@ -186,8 +196,6 @@ public class TraceMessage {
 		this.outHeaders = outHeaders;
 	}
 
-	// @Lob
-	@Column(columnDefinition = "VARCHAR(32672)")
 	public String getCausedByException() {
 		return causedByException;
 	}
@@ -204,41 +212,5 @@ public class TraceMessage {
 		this.routeId = routeId;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("TraceMessage [exchangeId=");
-		builder.append(exchangeId);
-		builder.append(", timestamp=");
-		builder.append(timestamp);
-		builder.append(", fromEndpointUri=");
-		builder.append(fromEndpointUri);
-		builder.append(", previousNode=");
-		builder.append(previousNode);
-		builder.append(", toNode=");
-		builder.append(toNode);
-		builder.append(", exchangePattern=");
-		builder.append(exchangePattern);
-		builder.append(", properties=");
-		builder.append(properties);
-		builder.append(", headers=");
-		builder.append(headers);
-		builder.append(", body=");
-		builder.append(body);
-		builder.append(", bodyType=");
-		builder.append(bodyType);
-		builder.append(", outHeaders=");
-		builder.append(outHeaders);
-		builder.append(", outBody=");
-		builder.append(outBody);
-		builder.append(", outBodyType=");
-		builder.append(outBodyType);
-		builder.append(", causedByException=");
-		builder.append(causedByException);
-		builder.append(", routeId=");
-		builder.append(routeId);
-		builder.append("]");
-		return builder.toString();
-	}
 
 }

@@ -3,7 +3,7 @@ package kr.co.bizframe.esb.mng.dao;
 import static kr.co.bizframe.esb.mng.type.Constants.SESSIONFACTORY_NAME;
 import static kr.co.bizframe.esb.mng.type.Constants.TRACE_DB_KEY;
 import static kr.co.bizframe.esb.mng.type.Constants.TRANSACTIONMANAGER_NAME;
-
+import static kr.co.bizframe.esb.mng.utils.Strings.trim;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -52,7 +52,7 @@ public class ExchangeInfoDao {
 	public ExchangeInfo get(String id) {		
 		return sessionFactory.getCurrentSession().get(ExchangeInfo.class, id);
 	}
-
+	
 	public List<ExchangeInfo> list() {
 		Session session = sessionFactory.getCurrentSession();
 		CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -69,7 +69,7 @@ public class ExchangeInfoDao {
 		boolean search = false;
 		Object searchValue = options.getStrSearch();
 
-		if (Strings.trim(searchKey) != null && Strings.trim(options.getStrSearch()) != null) {
+		if (trim(searchKey) != null && trim(options.getStrSearch()) != null) {
 			search = true;
 			if ("success".equals(searchKey)) {
 				searchValue = Boolean.parseBoolean(options.getStrSearch());
@@ -81,11 +81,11 @@ public class ExchangeInfoDao {
 			pd0.getExpressions().add(cb.equal(root.get(searchKey), searchValue));
 		}
 		
-		if (Strings.trim(options.getAgentId()) != null) {
+		if (trim(options.getAgentId()) != null) {
 			pd0.getExpressions().add(cb.equal(root.get("agentId"), options.getAgentId()));
 		}
 
-		if (Strings.trim(options.getRouteId()) != null) {
+		if (trim(options.getRouteId()) != null) {
 			pd0.getExpressions().add(cb.equal(root.get("routeId"), options.getRouteId()));
 		}
 		return pd0;
@@ -152,11 +152,12 @@ public class ExchangeInfoDao {
 			String searchKey = options.getSearchKey();
 			boolean search = false;
 
-			if (Strings.trim(searchKey) != null) {
+			if (trim(searchKey) != null) {
 				search = true;
 			}
-
-			List<ExchangeStatisticInfo> list = getExchageStatisticInfos(options.getFromDate(), options.getToDate());
+			
+			String searchValue = options.getStrSearch();
+			List<ExchangeStatisticInfo> list = getExchageStatisticInfos(options.getFromDate(), options.getToDate(), searchKey, searchValue);
 
 			if (search) {
 				// <date_key, <groupbyKeyValue, info>>
@@ -215,27 +216,32 @@ public class ExchangeInfoDao {
 		return null;
 	}
 	
-	public List<ExchangeStatisticInfo> getExchageStatisticInfos(String fromDate, String toDate) {
+	public List<ExchangeStatisticInfo> getExchageStatisticInfos(String fromDate, String toDate, String searchKey, String searchValue) {
+		boolean search = false;
+		if (trim(searchKey) !=null && trim(searchValue) !=null) {
+			search = true;
+		}
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("select");
 		sb.append("   count(*) as count, agentid as agentId, routeid as routeId, success, date(CREATED) as createDate");
 		sb.append("  from BIZFRAME_CAMEL_FINISHED_EXCHANGE");
-		sb.append(" where date(CREATED)");
-		if (toDate == null) {
-			sb.append(" = :date");
-		} else {
-			sb.append(" between :date and :date1");	
-		}		
+		sb.append(" where date(CREATED) between :date and :date1");
+		if (search) {
+			sb.append(" and ");
+			sb.append(searchKey);
+			sb.append(" = :searchVal ");
+		}
 		sb.append("   group by agentid, routeid, success, date(CREATED)");
 		String sql = sb.toString();
 
 		Session session = sessionFactory.getCurrentSession();
-		Query<ExchangeStatisticInfo> query = session.createSQLQuery(sql).
-				addEntity(ExchangeStatisticInfo.class)
-				.setParameter("date", fromDate);
-		
-		if (toDate != null) {
-			query.setParameter("date1", toDate);
+		Query<ExchangeStatisticInfo> query = session.createSQLQuery(sql)
+				.addEntity(ExchangeStatisticInfo.class)
+				.setParameter("date", fromDate)
+				.setParameter("date1", toDate);
+		if (search) {
+			query.setParameter("searchVal", searchValue);
 		}
 		return query.list();
 	}

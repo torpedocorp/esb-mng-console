@@ -17,11 +17,12 @@ String rId = Strings.trim(request.getParameter("r"), "");
 				    	<h1 class="uk-heading-large">Exchanges</h1>
 				    </div>
 				</div>
-				<br>            	
+				<br>   	
            		<div class="uk-overflow-container">
            				<form class="uk-form" id="form2" name="form2">
 							<input type="hidden" name="routeId" id="routeId" value="">
 							<input type="hidden" name="agentId" id="agentId" value="">
+							<input type="hidden" name="id" id="id" value="">
 							<input type="hidden" name="strSearch" id="strSearch" value="">
 							<input type="hidden" name="searchKey" id="searchKey" value="">
 						</form>
@@ -42,7 +43,26 @@ String rId = Strings.trim(request.getParameter("r"), "");
 			<button type="button" class="uk-modal-close uk-close"></button>
 				<div class="uk-modal-header">
 					<div id="traceTitleDiv"></div>
+					<table>
+               		<tr>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">AgentId</span></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="agentIdDiv"></div></td>
+               		</tr>				
+               		<tr>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">RouteId</span></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="exRouteIdDiv"></div></td>
+               		</tr>
+               		<tr>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">From Endpoint</span></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="fromDiv"></div></td>
+               		</tr>
+               		<tr>
+               			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">Status</span></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="statusDiv"></div></td>
+               		</tr>
+					</table>
 				</div>
+								
 				<div id="traceList"></div>
 				
 				<div class="uk-modal-footer uk-text-right">
@@ -50,12 +70,13 @@ String rId = Strings.trim(request.getParameter("r"), "");
 				</div>
 			</div>
 		</div>
+		<div id="toggleList"></div>
 		<%@ include file="msgModal.jsp"%>
 		<%@ include file="footer.jsp"%>
 		<script src="js/components/datepicker.js"></script>
+		<script src="js/underscore-min.js"></script>
 		<script src="js/list.js"></script>
 		<script>
-
 		var trInfo = {
 				url : "exchanges",
 				dataType: 'json',
@@ -70,18 +91,18 @@ String rId = Strings.trim(request.getParameter("r"), "");
 				align:["left", "left","left", "left", "left", "center"],
 				jsonKey: ["agentId", "exchangeId", "routeId", "created", "finished", "success"],
 				detailMethod : "showTrace",
-				detailLinkArgs : ["agentId","routeId","exchangeId"],
+				detailLinkArgs : ["agentId","routeId","exchangeId", "id"],
 				detailLinkTarget : "exchangeId",
 				colspan:6
 		};
 		
 		$(function () {
 			var html='<select style="border:1px solid #E5E5E5;" id="searchKey" name="searchKey">';
-			html +='<option value=""></option>';
+			html +='<option value="">Search Field</option>';
 			html +='<option value="agentId">AgentId</option>';
 			html +='<option value="exchangeId">ExchangeId</option>';
 			html +='<option value="routeId">RouteId</option>';
-			html +='<option value="success">Status</option>';
+			html +='<option value="success">Success</option>';
 			html +='</select>&nbsp;&nbsp;&nbsp;';
 			
 			$("#searchKeyDiv").html(html);
@@ -98,10 +119,11 @@ String rId = Strings.trim(request.getParameter("r"), "");
 
 			showLoading();
 			callApi(trInfo);
-		});		
+		});
 
-		function showDatas(trInfo, res) {
+		function showDatas(trInfo, res) {			
 			hideLoading();
+			var html ="";
 			for ( var i = 0; i < res.messages.length; i++) {
 				var ts = res.messages[i].created;
 				res.messages[i].created = new Date(ts).format('yyyy-MM-dd HH:mm:ss');
@@ -109,6 +131,7 @@ String rId = Strings.trim(request.getParameter("r"), "");
 				var exec = ts0-ts;
 				res.messages[i].finished = new Date(ts0).format('yyyy-MM-dd HH:mm:ss') + "   (" +exec+ " ms)";
 				var result = res.messages[i].success;
+				
 				if (result == true) {
 					res.messages[i].success = '<i class="uk-icon-check-circle" style="font-size:20px;color:#4B8A08;"></i>';
 				} else {
@@ -116,13 +139,14 @@ String rId = Strings.trim(request.getParameter("r"), "");
 				}
 			}
 			showListJson(trInfo, res);
+			
 		}
 
 		function viewError(error) {
 			alertBox(error);
 		}
 		
-		function showTrace(agentId, routeId, exchangeId) {
+		function showTrace(agentId, routeId, exchangeId, id) {
 			var info = {
 					url : "exchange/traces",
 					dataType: 'json',
@@ -130,37 +154,82 @@ String rId = Strings.trim(request.getParameter("r"), "");
 					checkCallCondition: 'no',
 					form:'form[name=form2]',
 					callback: "viewTraceMessages",
-					exchangeId : exchangeId
 			};			
 			$('#form2').find("#searchKey").val("exchangeId");
 			$('#form2').find("#strSearch").val(exchangeId);
 			$('#form2').find("#agentId").val(agentId);
 			$('#form2').find("#routeId").val(routeId);
+			$('#form2').find("#id").val(id);
+			
 			showLoading();
 			callApi(info);
 		}
 		
 		function viewTraceMessages(info, res) {
 			hideLoading();
-			$("#traceTitleDiv").html('<h2>' + info.exchangeId + ' Trace</h2>');
 			var trInfo0 = {
-					displayId: "traceList",
-					fieldWidths: [25,15,25,15,15], //%
-					fields: ["AgentId", "등록 일", "RouteId", "From", "To"],
-					align:["left", "left","left", "left", "left"],
-					jsonKey: ["agentId","timestamp", "routeId", "fromEndpointUri", "toNode"],
-					detailMethod : "showMessage",
-					detailLinkArgs : "id",
-					detailLinkTarget : "routeId",
-					pagelist: false,
+					fieldWidths: [40,30,30], //%
+					fields: ["To Node", "Time", "InOut"],
+					align:["left","left", "left"],
+					jsonKey: ["toNode", "timestamp", "traceInOut"],
 					colspan:5
 			};
+			
+			var from = "";
+			var groupby = _.groupBy(res.messages, function(row) {
+				return row.toNode;
+			});
+			
+			var body = '<table class="uk-table">';
+			body += listHeader(trInfo0);			
+			body += '<tbody>';
+			var j = 0;
+			for (key in groupby) {				
+				var arr = groupby[key];	
+				var cnt = arr.length;
+				if (j == 0) {
+					body += '<tr>';
+					body += '<td>'+arr[0].previousNode+'</td>';
+					body += '<td></td>';
+					body += '<td></td>';
+					body += '</tr>';
+				}
+				for (var i = 0; i < cnt; i++) {					
+					body += '<tr>';
+					if (i == 0) {						
+						body += '<td rowspan="'+cnt+'">'+key+'</td>';
+					}
+					var ts = arr[i].timestamp;
+					ts = new Date(ts).format('yyyy-MM-dd HH:mm:ss');					 
+					from = arr[i].fromEndpointUri;
+					body += '<td>'+ts+'</td>';
+					body += '<td><a href="javascript:showMessage(\''+arr[i].id+'\')">'+arr[i].traceInOut.toUpperCase()+'</a></td>';
+					body += '</tr>';
+				}
+				j++;
+			};
+			$("#traceList").html(body);
+			/* 
 			for ( var i = 0; i < res.messages.length; i++) {
 				var ts = res.messages[i].timestamp;
 				res.messages[i].timestamp = new Date(ts).format('yyyy-MM-dd HH:mm:ss');
+				res.messages[i].traceInOut = res.messages[i].traceInOut.toUpperCase(); 
+				from = res.messages[i].fromEndpointUri;
 			}
-			showListJson(trInfo0, res);
-			UIkit.modal("#traceModal").show();  
+			showListJson(trInfo0, res); */
+			
+			var status = "";			
+			if (res.exchange.success == true) {
+				status = '<i class="uk-icon-check-circle" style="font-size:20px;color:#4B8A08;"></i>';
+			} else {
+				status = '<i class="uk-icon-exclamation-triangle" style="font-size:18px;color:#DF3A01;"></i> &nbsp;' + res.exchange.errorMsg;
+			}
+			$("#traceTitleDiv").html('<h2>' + res.exchange.exchangeId + '</h2>');
+			$("#agentIdDiv").html(res.exchange.agentId);
+			$("#exRouteIdDiv").html(res.exchange.routeId);
+			$("#fromDiv").html(from);
+			$("#statusDiv").html(status);
+			UIkit.modal("#traceModal", {modal: false}).show();  
 		}
 		</script>
     </body>

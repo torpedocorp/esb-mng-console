@@ -16,6 +16,7 @@ import static org.hibernate.cfg.AvailableSettings.PASS;
 import static org.hibernate.cfg.AvailableSettings.SHOW_SQL;
 import static org.hibernate.cfg.AvailableSettings.URL;
 import static org.hibernate.cfg.AvailableSettings.USER;
+import static org.hibernate.cfg.AvailableSettings.DIALECT;
 
 import java.util.Properties;
 
@@ -51,9 +52,10 @@ public class AppConfig {
 		props.put(URL, env.getProperty(key + ".db.url"));
 		props.put(USER, env.getProperty(key + ".db.user"));
 		props.put(PASS, env.getProperty(key + ".db.password"));
-
+		
 		// Setting Hibernate properties
-		props.put(SHOW_SQL, env.getProperty(key + ".hibernate.show_sql"));
+		props.put(DIALECT, env.getProperty(key + ".hibernate.dialect", "kr.co.bizframe.esb.camel.monitoring.tracer.FixedDerbyDialect"));
+		props.put(SHOW_SQL, env.getProperty(key + ".hibernate.show_sql", "false"));
 		props.put(HBM2DDL_AUTO, env.getProperty(key + ".hibernate.hbm2ddl.auto"));
 		//props.put(HBM2DDL_IMPORT_FILES, env.getProperty(key + ".hibernate.hbm2ddl.import_files"));
 		props.put(HBM2DDL_IMPORT_FILES_SQL_EXTRACTOR, "org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor");

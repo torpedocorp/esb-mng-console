@@ -3,6 +3,7 @@ package kr.co.bizframe.esb.mng.model.trace;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
@@ -30,7 +31,8 @@ public class ExchangeInfo {
 	private Date created;
 	private Date finished;
 	private boolean success;
-
+	
+	@Column(length = 32672)
 	private String errorMsg;
 
 	public String getErrorMsg() {
