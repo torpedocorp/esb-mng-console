@@ -217,7 +217,7 @@
 					    physics:{
 				          barnesHut:{gravitationalConstant:-2000}
 				        },
-				        //physics : false,
+				        physics : false,
 				        /* layout: {randomSeed:0}, */
 				         "layout": {
 						    "hierarchical": {
