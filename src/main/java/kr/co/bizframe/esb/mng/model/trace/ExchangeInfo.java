@@ -16,7 +16,8 @@ import javax.persistence.TemporalType;
 		@Index(columnList = "AGENTID", name = "IDX_FINISHED_EXCHANGE_AGENTID"),
 		@Index(columnList = "EXCHANGEID", name = "IDX_FINISHED_EXCHANGE_EXCHANGEID"),
 		@Index(columnList = "ROUTEID", name = "IDX_FINISHED_EXCHANGE_ROUTEID"),
-		@Index(columnList = "SUCCESS", name = "IDX_FINISHED_EXCHANGE_SUCCESS"), })
+		@Index(columnList = "SUCCESS", name = "IDX_FINISHED_EXCHANGE_SUCCESS"),
+		@Index(columnList = "CREATED", name = "IDX_CREATED")})
 public class ExchangeInfo {
 
 	@Id

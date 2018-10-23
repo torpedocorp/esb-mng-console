@@ -6,7 +6,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -17,7 +16,8 @@ import javax.persistence.TemporalType;
 		@Index(columnList = "EXCHANGEID", name = "IDX_MESSAGETRACED_EXCHANGEID"),
 		@Index(columnList = "ROUTEID", name = "IDX_MESSAGETRACED_ROUTEID"),
 		@Index(columnList = "FROMENDPOINTURI", name = "IDX_MESSAGETRACED_FROMENDPOINTURI"),
-		@Index(columnList = "TONODE", name = "IDX_MESSAGETRACED_TONODE"), })
+		@Index(columnList = "TONODE", name = "IDX_MESSAGETRACED_TONODE"),
+		@Index(columnList = "TIMESTAMP", name = "IDX_TIMESTAMP"),})
 public class TraceMessage {
 	
 	@Id
