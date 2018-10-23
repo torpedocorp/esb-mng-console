@@ -54,7 +54,7 @@ public class AppConfig {
 		props.put(PASS, env.getProperty(key + ".db.password"));
 		
 		// Setting Hibernate properties
-		props.put(DIALECT, env.getProperty(key + ".hibernate.dialect", "org.hibernate.dialect.DerbyDialect"));
+		props.put(DIALECT, env.getProperty(key + ".hibernate.dialect", "kr.co.bizframe.esb.camel.monitoring.tracer.FixedDerbyDialect"));
 		props.put(SHOW_SQL, env.getProperty(key + ".hibernate.show_sql", "false"));
 		props.put(HBM2DDL_AUTO, env.getProperty(key + ".hibernate.hbm2ddl.auto"));
 		//props.put(HBM2DDL_IMPORT_FILES, env.getProperty(key + ".hibernate.hbm2ddl.import_files"));
