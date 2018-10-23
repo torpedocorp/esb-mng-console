@@ -3,7 +3,7 @@
 esb-mng-console은 camel 기반의 ESB 어플리케이션 운영을 위한 관리콘솔 웹 어플리케이션입니다.
 <!--more-->
 
-esb-mng-console을 이용하여 camel기반 ESB 어플리케이션과 bizframe-mas를 운영할 수 있습니다.
+esb-mng-console을 이용하여 camel기반 ESB 어플리케이션과 bizframe-mas를 효과적으로 운영할 수 있습니다.
 
 ## feature
 
