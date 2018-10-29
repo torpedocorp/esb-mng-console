@@ -54,11 +54,11 @@ String rId = Strings.trim(request.getParameter("r"), "");
                		</tr>
                		<tr>
                			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">From Endpoint</span></td>
-               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="fromDiv"></div></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="fromDiv" style="word-break:break-all;"></div></td>
                		</tr>
                		<tr>
                			<td style="text-align:left; border-bottom : 0px;"><span class="uk-text-bold uk-text-middle">Status</span></td>
-               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="statusDiv"></div></td>
+               			<td style="padding-left:10px;text-align:left; border-bottom : 0px;"><div id="statusDiv" style="word-break:break-all;"></div></td>
                		</tr>
 					</table>
 				</div>
@@ -202,8 +202,13 @@ String rId = Strings.trim(request.getParameter("r"), "");
 					var ts = arr[i].timestamp;
 					ts = new Date(ts).format('yyyy-MM-dd HH:mm:ss');					 
 					from = arr[i].fromEndpointUri;
+					var err = arr[i].causedByException;
+					var errIcon ="";
+					if (err != undefined && err.length > 0) {
+						errIcon = '<i class="uk-icon-exclamation-triangle" style="font-size:18px;color:#DF3A01;"></i> &nbsp;';
+					}
 					body += '<td>'+ts+'</td>';
-					body += '<td><a href="javascript:showMessage(\''+arr[i].id+'\')">'+arr[i].traceInOut.toUpperCase()+'</a></td>';
+					body += '<td>'+errIcon+'<a href="javascript:showMessage(\''+arr[i].id+'\')">'+arr[i].traceInOut.toUpperCase()+'</a></td>';
 					body += '</tr>';
 				}
 				j++;
