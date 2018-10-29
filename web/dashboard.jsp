@@ -11,14 +11,12 @@
 				    <div class="uk-width-2-3">
 				    	<h1 class="uk-heading-large">Camel RealTime Monitoring</h1>
 				    </div>
-				    <div class="uk-width-1-3" align="right">
+				    <div class="uk-width-1-3" align="right">				    	
 						<button class="uk-button uk-button-primary" style="background-color: #1ABB9C;" type="button" data-uk-modal="{target:'#agentModal'}"><i class="uk-icon-plus"></i>&nbsp;Target Route 등록</button>    
 				    </div>
 				</div>
-				<br>			
-				<div id="mynetwork" class="uk-overflow-container">
-	            </div>			
-			</div>
+			</div>		
+			<div id="mynetwork" class="uk-overflow-container"></div>
 		</div>
 		<div id="agentModal" class="uk-modal" aria-hidden="true" style="display: none; overflow-y: scroll;">
            <form class="uk-form" id="form1" name="form1" method="POST">
@@ -215,15 +213,21 @@
 		      var container = document.getElementById('mynetwork');
 			  var options = {
 					    physics:{
-				          barnesHut:{gravitationalConstant:-2000}
+					      enabled: false,
+				          barnesHut:{gravitationalConstant:-1000}			  			  
+				        },				        
+				        layout: {
+				        	//randomSeed:0,				        
+				            hierarchical: {				            		
+				            	//enable : true,
+				                direction: "DU",
+				                sortMethod: "directed",
+				                nodeSpacing: 210,
+				                levelSeparation: 200,
+				                treeSpacing : 250,
+				            }
 				        },
-				        physics : false,
-				        /* layout: {randomSeed:0}, */
-				         "layout": {
-						    "hierarchical": {
-						      "enabled": false
-						    }
-						 },
+				        
 					    height: '100%',
 					    width: '100%',
 						edges : {
@@ -233,7 +237,8 @@
 						},
 						groups: groupOpts,
 						nodes : {
-							widthConstraint: { minimum: 120, maximum: 120,},						   			
+							widthConstraint: { minimum: 120, maximum: 120,},
+							//heightConstraint: { minimum: 80, maximum: 80,},
 							shape : 'box',
 							font : {
 								bold : {
