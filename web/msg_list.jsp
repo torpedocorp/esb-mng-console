@@ -75,6 +75,10 @@
 				res.messages[i].traceInOut = res.messages[i].traceInOut.toUpperCase();
 				res.messages[i].fromEndpointUri = '<div style="word-break:break-all;">' + res.messages[i].fromEndpointUri + '</div>';
 				
+				var err = res.messages[i].causedByException;
+				if (err != undefined && err.length > 0) {
+					res.messages[i].toNode = '<i class="uk-icon-exclamation-triangle" style="font-size:18px;color:#DF3A01;"></i> &nbsp;' + res.messages[i].toNode;  
+				}
 			}
 			
 			showListJson(trInfo, res);
