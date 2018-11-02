@@ -216,7 +216,7 @@
 					      enabled: false,
 				          barnesHut:{gravitationalConstant:-1000}			  			  
 				        },				        
-				        layout: {
+				        layout: {							
 				        	//randomSeed:0,				        
 				            hierarchical: {				            		
 				            	//enable : true,
