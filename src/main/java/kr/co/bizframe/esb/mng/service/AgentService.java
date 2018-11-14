@@ -247,7 +247,7 @@ public class AgentService {
 		}
 	}
 
-	private void todayClear() {
+	public void todayClear() {
 		routeDatas.clear();
 	}
 
