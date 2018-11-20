@@ -51,7 +51,7 @@ public class AppConfig {
 		props.put(DRIVER, env.getProperty(key + ".db.driver"));
 		props.put(URL, env.getProperty(key + ".db.url"));
 		props.put(USER, env.getProperty(key + ".db.user"));
-		props.put(PASS, env.getProperty(key + ".db.password"));		
+		props.put(PASS, env.getProperty(key + ".db.password"));
 		
 		// Setting Hibernate properties
 		props.put(DIALECT, env.getProperty(key + ".hibernate.dialect", "org.hibernate.dialect.DerbyDialect"));

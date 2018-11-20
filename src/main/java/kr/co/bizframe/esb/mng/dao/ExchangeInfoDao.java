@@ -4,8 +4,8 @@ import static kr.co.bizframe.esb.mng.type.Constants.SESSIONFACTORY_NAME;
 import static kr.co.bizframe.esb.mng.type.Constants.TRACE_DB_KEY;
 import static kr.co.bizframe.esb.mng.type.Constants.TRANSACTIONMANAGER_NAME;
 import static kr.co.bizframe.esb.mng.utils.Strings.trim;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -33,7 +33,6 @@ import kr.co.bizframe.esb.mng.model.SearchOptions;
 import kr.co.bizframe.esb.mng.model.trace.ExchangeInfo;
 import kr.co.bizframe.esb.mng.model.trace.ExchangeStatisticInfo;
 import kr.co.bizframe.esb.mng.utils.PagingUtil;
-import kr.co.bizframe.esb.mng.utils.Strings;
 
 @Repository
 @Transactional(transactionManager = TRACE_DB_KEY + TRANSACTIONMANAGER_NAME)
