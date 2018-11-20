@@ -557,41 +557,48 @@ public class AgentService {
 				 
 		List<String> fromToList = fromRouteToList.get(info.getFromRouteId());
 		if (fromToList == null) {
-			fromToList = new ArrayList<>();				
+			fromToList = new ArrayList<String>();				
 		}		
 		
-		Agent to = null;
+		
 		if (trim(info.getToRouteId()) != null) {
-			to = get(info.getToAgentId());
-			if (to == null) {
-				to = new Agent();
-				isToInsert = true;
-				// 기본 toList 작성				
-				Map<String, List<String>> toRouteToList = to.getRouteToList();
-				toRouteToList.put(info.getToRouteId(), new ArrayList<String>());
-				to.setToList(gson.toJson(toRouteToList));
-			}
-			
-			to.setAgentId(info.getToAgentId());
-			if (trim(info.getToJolokiaUrl()) != null) {
-				to.setJolokiaUrl(info.getToJolokiaUrl());
-			}
-			
-			if (trim(info.getToLabel()) != null) {
-				to.setLabel(info.getToLabel());
-			}
-			
 			// agent.agentId + '_' + routeId
-			fromToList.add(getRoutePrimaryKey(info.getToAgentId(), info.getToRouteId()));
+			String key = getRoutePrimaryKey(info.getToAgentId(), info.getToRouteId());
+			if (fromToList.contains(key)) {
+			} else {
+				fromToList.add(key);
+			}
 		}
 		
-		fromRouteToList.put(info.getFromRouteId(), fromToList);		
+		fromRouteToList.put(info.getFromRouteId(), fromToList);
+		
 		from.setToList(gson.toJson(fromRouteToList));
 		save(isFromInsert, from);
 		
-		if (to == null || from.getAgentId().equals(to.getAgentId())) {
+		if (trim(info.getToRouteId()) == null) {
 			return;
 		}
+		
+		Agent to = null;
+		to = get(info.getToAgentId());
+		if (to == null) {
+			to = new Agent();
+			isToInsert = true;
+		}
+		
+		// 기본 toList 작성				
+		Map<String, List<String>> toRouteToList = to.getRouteToList();
+		toRouteToList.put(info.getToRouteId(), new ArrayList<String>());
+		to.setToList(gson.toJson(toRouteToList));
+		
+		to.setAgentId(info.getToAgentId());
+		if (trim(info.getToJolokiaUrl()) != null) {
+			to.setJolokiaUrl(info.getToJolokiaUrl());
+		}
+		
+		if (trim(info.getToLabel()) != null) {
+			to.setLabel(info.getToLabel());
+		}		
 		
 		save(isToInsert, to);
 	}	
@@ -634,12 +641,17 @@ public class AgentService {
 		if (agent == null) {
 			return;
 		}
-
+		
+		//{"rest-1":["camel-esb-perf-server_route1"],"route1":[]}
 		Map<String, List<String>> routeToList = agent.getRouteToList();
 		if (routeToList.containsKey(routeId)) {
 			routeToList.remove(routeId);
 		}
-
+		for (String routeId0 : routeToList.keySet()) {
+			List<String> list = routeToList.get(routeId0);
+			list.remove(getRoutePrimaryKey(agentId, routeId));
+		}
+		
 		// refresh monitoring data
 		if (routeToList.size() == 0) {
 			agentDao.delete(agentId);
@@ -653,9 +665,15 @@ public class AgentService {
 		} else {
 			Gson gson = new Gson();
 			agent.setToList(gson.toJson(routeToList));
-
+			logger.debug("============= agent " + agent.getToList());
 			agentDao.update(agent);
-
+			
+			try {
+				removeAgentScheduler(agentId);
+			} catch (Throwable e) {
+				throw new RuntimeException(e);
+			}
+			initMonitoringAgent(agent);		
 		}
 	}
 
