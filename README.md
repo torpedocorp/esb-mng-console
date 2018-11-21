@@ -24,7 +24,7 @@ esb-mng-console을 이용하여 camel기반 ESB 어플리케이션과 bizframe-m
 
  1. jdk 8 이상 설치 
  2. apache ant 설치
- 3. esb-mng-console 프로젝트 저장소에서 소스를 clone 혹은 다운르도 (https://github.com/torpedocorp/esb-mng-console)
+ 3. esb-mng-console 프로젝트 저장소에서 소스를 clone 혹은 다운로드 (https://github.com/torpedocorp/esb-mng-console)
  4. 커맨드 라인상에서 ant build 수행
 
 ## Architecture
