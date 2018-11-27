@@ -29,7 +29,7 @@
   	<class>kr.co.bizframe.esb.mng.model.trace.BIZFRAME_CAMEL_MESSAGETRACED</class>
  		<properties>
 			<property name="openjpa.ConnectionDriverName" value="org.apache.derby.jdbc.ClientDriver" />
-			<property name="openjpa.ConnectionURL" value="jdbc:derby://192.168.10.207:3333/./../data/db/trace;create=true" />
+			<property name="openjpa.ConnectionURL" value="jdbc:derby://localhost:3333/./../data/db/trace;create=true" />
 			<property name="openjpa.ConnectionUserName" value="app"/>
       		<property name="openjpa.ConnectionPassword" value="app"/>
       		<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
@@ -42,7 +42,7 @@
   	<class>kr.co.bizframe.esb.mng.jpa.Person</class>
  		<properties>
 			<property name="openjpa.ConnectionDriverName" value="org.apache.derby.jdbc.ClientDriver" />
-			<property name="openjpa.ConnectionURL" value="jdbc:derby://192.168.10.207:3333/./../data/db/config;create=true" />
+			<property name="openjpa.ConnectionURL" value="jdbc:derby://localhost:3333/./../data/db/config;create=true" />
 			<property name="openjpa.ConnectionUserName" value="app"/>
       		<property name="openjpa.ConnectionPassword" value="app"/>
       		<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
