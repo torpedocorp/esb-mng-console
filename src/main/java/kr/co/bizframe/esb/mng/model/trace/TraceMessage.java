@@ -2,22 +2,18 @@ package kr.co.bizframe.esb.mng.model.trace;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "BIZFRAME_CAMEL_MESSAGETRACED", indexes = {
-		@Index(columnList = "AGENTID", name = "IDX_MESSAGETRACED_AGENTID"),
-		@Index(columnList = "EXCHANGEID", name = "IDX_MESSAGETRACED_EXCHANGEID"),
-		@Index(columnList = "ROUTEID", name = "IDX_MESSAGETRACED_ROUTEID"),
-		@Index(columnList = "FROMENDPOINTURI", name = "IDX_MESSAGETRACED_FROMENDPOINTURI"),
-		@Index(columnList = "TONODE", name = "IDX_MESSAGETRACED_TONODE"),
-		@Index(columnList = "TIMESTAMP", name = "IDX_TIMESTAMP"),})
+@Table(name = "BIZFRAME_CAMEL_MESSAGETRACED")
+@Access(AccessType.FIELD)
 public class TraceMessage {
 	
 	@Id

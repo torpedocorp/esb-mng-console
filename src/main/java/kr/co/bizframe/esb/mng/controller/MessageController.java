@@ -24,25 +24,24 @@ import kr.co.bizframe.esb.mng.service.MessageService;
 @RestController
 public class MessageController {
 
-   @Autowired
-   private MessageService messageService;
+	@Autowired
+	private MessageService messageService;
 
 	@Autowired
 	private ExchangeInfoDao exchangeInfoDao;
-	
-   /*---Add new msg---*/
-   @PostMapping("/msg")
-   public ResponseEntity<?> save(@RequestBody TraceMessage msg) {
-      String id = messageService.save(msg);
-      return ResponseEntity.ok().body("New BizFrameJpaTraceEventMessage has been saved with ID:" + id);
-   }
 
-   /*---Get a msg by id---*/
-   @GetMapping("/msg/{id}")
-   public ResponseEntity<TraceMessage> get(@PathVariable("id") String id) {
-      TraceMessage msg = messageService.get(id);
-      return ResponseEntity.ok().body(msg);
-   }
+	/*---Add new msg---*/
+	@PostMapping("/msg")
+	public ResponseEntity<?> save(@RequestBody TraceMessage msg) throws Exception {
+		throw new Exception("post /msg unsupported !!");
+	}
+
+	/*---Get a msg by id---*/
+	@GetMapping("/msg/{id}")
+	public ResponseEntity<TraceMessage> get(@PathVariable("id") String id) {
+		TraceMessage msg = messageService.get(id);
+		return ResponseEntity.ok().body(msg);
+	}
 
 	/*---get all msgs---*/
 	@PostMapping("/msgs")
@@ -70,18 +69,16 @@ public class MessageController {
 		jsonResponse.put("exchange", exchange);
 		return ResponseEntity.ok().body(jsonResponse);
 	}
-	
-   /*---Update a msg by id---*/
-   @PutMapping("/msg/{id}")
-   public ResponseEntity<?> update(@PathVariable("id") String id, @RequestBody TraceMessage msg) {
-      messageService.update(id, msg);
-      return ResponseEntity.ok().body("BizFrameJpaTraceEventMessage has been updated successfully.");
-   }
 
-   /*---Delete a msg by id---*/
-   @DeleteMapping("/msg/{id}")
-   public ResponseEntity<?> delete(@PathVariable("id") String id) {
-      messageService.delete(id);
-      return ResponseEntity.ok().body("BizFrameJpaTraceEventMessage has been deleted successfully.");
-   }
+	/*---Update a msg by id---*/
+	@PutMapping("/msg/{id}")
+	public ResponseEntity<?> update(@PathVariable("id") String id, @RequestBody TraceMessage msg) throws Exception {
+		throw new Exception("put /msg/{id} unsupported !!");
+	}
+
+	/*---Delete a msg by id---*/
+	@DeleteMapping("/msg/{id}")
+	public ResponseEntity<?> delete(@PathVariable("id") String id) throws Exception {
+		throw new Exception("delete /msg/{id} unsupported !!");
+	}
 }

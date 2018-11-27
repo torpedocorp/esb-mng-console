@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!-- START SNIPPET: e1 -->
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             version="1.0">
+
+  <persistence-unit name="trace" transaction-type="RESOURCE_LOCAL">
+  	<provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+  	<class>kr.co.bizframe.esb.mng.model.trace.ExchangeInfo</class>
+
+  	<class>kr.co.bizframe.esb.mng.model.trace.BIZFRAME_CAMEL_MESSAGETRACED</class>
+ 		<properties>
+			<property name="openjpa.ConnectionDriverName" value="org.apache.derby.jdbc.ClientDriver" />
+			<property name="openjpa.ConnectionURL" value="jdbc:derby://192.168.10.207:3333/./../data/db/trace;create=true" />
+			<property name="openjpa.ConnectionUserName" value="app"/>
+      		<property name="openjpa.ConnectionPassword" value="app"/>
+      		<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
+			<property name="openjpa.RuntimeUnenhancedClasses" value="supported"/>
+       </properties>
+	</persistence-unit>
+  <persistence-unit name="config" transaction-type="RESOURCE_LOCAL">
+  	<provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+  	<class>kr.co.bizframe.esb.mng.model.config.Agent</class>
+  	<class>kr.co.bizframe.esb.mng.jpa.Person</class>
+ 		<properties>
+			<property name="openjpa.ConnectionDriverName" value="org.apache.derby.jdbc.ClientDriver" />
+			<property name="openjpa.ConnectionURL" value="jdbc:derby://192.168.10.207:3333/./../data/db/config;create=true" />
+			<property name="openjpa.ConnectionUserName" value="app"/>
+      		<property name="openjpa.ConnectionPassword" value="app"/>
+      		<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
+			<property name="openjpa.RuntimeUnenhancedClasses" value="supported"/>
+       </properties>
+	</persistence-unit>
+</persistence>
+  <!-- END SNIPPET: e1 -->

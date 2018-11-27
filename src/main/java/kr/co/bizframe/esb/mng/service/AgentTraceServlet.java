@@ -1,8 +1,5 @@
 package kr.co.bizframe.esb.mng.service;
 
-import static kr.co.bizframe.esb.mng.type.Constants.TRACE_DB_KEY;
-import static kr.co.bizframe.esb.mng.type.Constants.TRANSACTIONMANAGER_NAME;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -120,8 +116,7 @@ public class AgentTraceServlet extends HttpServlet {
 		}
 		return infos;
 	}
-	
-	@Transactional(transactionManager = TRACE_DB_KEY + TRANSACTIONMANAGER_NAME)
+
 	public void saveExchangeInfo(ExchangeInfo info) {
 		// put memory
 		String agentId = info.getAgentId();

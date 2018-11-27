@@ -2,10 +2,10 @@ package kr.co.bizframe.esb.mng.dao;
 
 import static kr.co.bizframe.esb.mng.type.Constants.SESSIONFACTORY_NAME;
 import static kr.co.bizframe.esb.mng.type.Constants.TRACE_DB_KEY;
-import static kr.co.bizframe.esb.mng.type.Constants.TRANSACTIONMANAGER_NAME;
 import static kr.co.bizframe.esb.mng.utils.Strings.trim;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -14,19 +14,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.bizframe.esb.mng.model.PagingModel;
 import kr.co.bizframe.esb.mng.model.SearchOptions;
@@ -35,35 +35,44 @@ import kr.co.bizframe.esb.mng.model.trace.ExchangeStatisticInfo;
 import kr.co.bizframe.esb.mng.utils.PagingUtil;
 
 @Repository
-@Transactional(transactionManager = TRACE_DB_KEY + TRANSACTIONMANAGER_NAME)
 public class ExchangeInfoDao {
 
 	private Logger logger = Logger.getLogger(getClass());
 
 	@Autowired
 	@Qualifier(value = TRACE_DB_KEY + SESSIONFACTORY_NAME)
-	private SessionFactory sessionFactory;
+	private EntityManagerFactory emf;
 
 	public void save(ExchangeInfo msg) {
-		sessionFactory.getCurrentSession().save(msg);		
+		EntityManager session = emf.createEntityManager();
+		session.getTransaction().begin();
+		session.persist(msg);
+		session.getTransaction().commit();
+		session.close();
 	}
 
-	public ExchangeInfo get(String id) {		
-		return sessionFactory.getCurrentSession().get(ExchangeInfo.class, id);
+	public ExchangeInfo get(String id) {
+		EntityManager session = emf.createEntityManager();
+		ExchangeInfo info = session.find(ExchangeInfo.class, id);
+		session.close();
+		return info;
 	}
-	
+
 	public List<ExchangeInfo> list() {
-		Session session = sessionFactory.getCurrentSession();
-		CriteriaBuilder cb = session.getCriteriaBuilder();
+		EntityManager session = emf.createEntityManager();
+		CriteriaBuilder cb = emf.getCriteriaBuilder();
 		CriteriaQuery<ExchangeInfo> cq = cb.createQuery(ExchangeInfo.class);
 		Root<ExchangeInfo> root = cq.from(ExchangeInfo.class);
 		cq.select(root);
-		Query<ExchangeInfo> query = session.createQuery(cq);
-		return query.getResultList();
+		TypedQuery<ExchangeInfo> query = session.createQuery(cq);
+		List<ExchangeInfo> list = query.getResultList();
+		session.close();
+		return list;
 	}
-	
-	private Predicate getPredicate(CriteriaBuilder cb, SearchOptions options, Date fromDate, Date toDate,
+
+	private Predicate[] getPredicate(CriteriaBuilder cb, SearchOptions options, Date fromDate, Date toDate,
 			Root<ExchangeInfo> root) {
+		List<Predicate> predicates = new ArrayList<Predicate>();
 		String searchKey = options.getSearchKey();
 		boolean search = false;
 		Object searchValue = options.getStrSearch();
@@ -74,31 +83,30 @@ public class ExchangeInfoDao {
 				searchValue = Boolean.parseBoolean(options.getStrSearch());
 			}
 		}
-		Predicate pd0 = cb.and(cb.greaterThanOrEqualTo(root.<Date>get("created"), fromDate),
-				cb.lessThan(root.<Date>get("created"), toDate));
+		predicates.add(cb.and(cb.greaterThanOrEqualTo(root.<Date>get("created"), fromDate),
+				cb.lessThan(root.<Date>get("created"), toDate)));
 		if (search) {
-			pd0.getExpressions().add(cb.equal(root.get(searchKey), searchValue));
+			predicates.add(cb.equal(root.get(searchKey), searchValue));
 		}
-		
+
 		if (trim(options.getAgentId()) != null) {
-			pd0.getExpressions().add(cb.equal(root.get("agentId"), options.getAgentId()));
+			predicates.add(cb.equal(root.get("agentId"), options.getAgentId()));
 		}
 
 		if (trim(options.getRouteId()) != null) {
-			pd0.getExpressions().add(cb.equal(root.get("routeId"), options.getRouteId()));
+			predicates.add(cb.equal(root.get("routeId"), options.getRouteId()));
 		}
-		return pd0;
+		return predicates.toArray(new Predicate[]{});
 	}
-	
+
 	public PagingModel<ExchangeInfo> pagedList(SearchOptions options) {
 		PagingModel<ExchangeInfo> vo = new PagingModel<>();
 		try {
 			PagingUtil.getPageArgs(options);
+			EntityManager session = emf.createEntityManager();
+			CriteriaBuilder cb = session.getCriteriaBuilder();
+			logger.debug(options);
 
-			Session session = sessionFactory.getCurrentSession();
-			CriteriaBuilder cb = session.getCriteriaBuilder();			
-			logger.debug(options);			
-			
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			Date fromDate = df.parse(options.getFromDate());
 			Date toDate = df.parse(options.getToDate());
@@ -106,44 +114,33 @@ public class ExchangeInfoDao {
 			cal.setTime(toDate);
 			cal.add(Calendar.DATE, 1);
 			toDate = cal.getTime();
-			
+
 			CriteriaQuery<Long> countCq = cb.createQuery(Long.class);
-			Root<ExchangeInfo> root4 = countCq.from(ExchangeInfo.class);			
-			countCq.where(getPredicate(cb, options, fromDate, toDate, root4));
-	        countCq.select(cb.countDistinct(root4));
-	        Query<Long> query4 = session.createQuery(countCq);
-	        long distinct = query4.getSingleResult();
-	        vo.setCount(distinct);
-	        
+			Root<ExchangeInfo> root4 = countCq.from(ExchangeInfo.class);
+			countCq.select(cb.countDistinct(root4));
+			countCq.where(getPredicate(cb, options, fromDate, toDate, root4));			
+			TypedQuery<Long> query4 = session.createQuery(countCq);
+			long distinct = query4.getSingleResult();
+			vo.setCount(distinct);
+
 			CriteriaQuery<ExchangeInfo> cq = cb.createQuery(ExchangeInfo.class);
-			Root<ExchangeInfo> root = cq.from(ExchangeInfo.class);			
-			cq.where(getPredicate(cb, options, fromDate, toDate, root));			
+			Root<ExchangeInfo> root = cq.from(ExchangeInfo.class);
 			cq.select(root);
+			cq.where(getPredicate(cb, options, fromDate, toDate, root));
 			cq.orderBy(cb.desc(root.get("created")));
-			Query<ExchangeInfo> query = session.createQuery(cq);
+			TypedQuery<ExchangeInfo> query = session.createQuery(cq);
 			query.setFirstResult(options.getIndex());
 			query.setMaxResults(options.getLimit());
 			vo.setModels(query.getResultList());
+			session.close();
 			return vo;
-			
+
 		} catch (Throwable e) {
 			logger.error("list " + options + " error " + e.getMessage(), e);
 			return null;
 		}
 	}
-	
-	public void update(String id, ExchangeInfo msg) {
-		Session session = sessionFactory.getCurrentSession();
-		session.byId(ExchangeInfo.class).load(id);
-		session.flush();
-	}
 
-	public void delete(String id) {
-		Session session = sessionFactory.getCurrentSession();
-		ExchangeInfo msg = session.byId(ExchangeInfo.class).load(id);
-		session.delete(msg);
-	}
-	
 	public Collection<ExchangeStatisticInfo> getExchageStatisticInfos(SearchOptions options) {
 		try {
 			PagingUtil.getPageArgs(options);
@@ -154,9 +151,10 @@ public class ExchangeInfoDao {
 			if (trim(searchKey) != null) {
 				search = true;
 			}
-			
+
 			String searchValue = options.getStrSearch();
-			List<ExchangeStatisticInfo> list = getExchageStatisticInfos(options.getFromDate(), options.getToDate(), searchKey, searchValue);
+			List<ExchangeStatisticInfo> list = getExchageStatisticInfos(options.getFromDate(), options.getToDate(),
+					searchKey, searchValue);
 
 			if (search) {
 				// <date_key, <groupbyKeyValue, info>>
@@ -214,55 +212,55 @@ public class ExchangeInfoDao {
 
 		return null;
 	}
-	
-	public List<ExchangeStatisticInfo> getExchageStatisticInfos(String fromDate, String toDate, String searchKey, String searchValue) {
+
+	public List<ExchangeStatisticInfo> getExchageStatisticInfos(String fromDate, String toDate, String searchKey,
+			String searchValue) {
 		boolean search = false;
-		if (trim(searchKey) !=null && trim(searchValue) !=null) {
+		if (trim(searchKey) != null && trim(searchValue) != null) {
 			search = true;
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("select");
 		sb.append("   count(*) as count, agentid as agentId, routeid as routeId, success, date(CREATED) as createDate");
 		sb.append("  from BIZFRAME_CAMEL_FINISHED_EXCHANGE");
-		sb.append(" where date(CREATED) between :date and :date1");
+		sb.append(" where date(CREATED) between ?1 and ?2");
 		if (search) {
 			sb.append(" and ");
 			sb.append(searchKey);
-			sb.append(" = :searchVal ");
+			sb.append(" = ?3 ");
 		}
 		sb.append("   group by agentid, routeid, success, date(CREATED)");
 		String sql = sb.toString();
 
-		Session session = sessionFactory.getCurrentSession();
-		Query<ExchangeStatisticInfo> query = session.createSQLQuery(sql)
-				.addEntity(ExchangeStatisticInfo.class)
-				.setParameter("date", fromDate)
-				.setParameter("date1", toDate);
+		EntityManager session = emf.createEntityManager();
+		Query query = session.createNativeQuery(sql, ExchangeStatisticInfo.class).setParameter(1, fromDate).setParameter(2, toDate);
 		if (search) {
-			query.setParameter("searchVal", searchValue);
+			query.setParameter(3, searchValue);
 		}
-		return query.list();
+		List<ExchangeStatisticInfo> list = query.getResultList();
+		session.close();
+		return list;
 	}
-	
+
 	public List<ExchangeStatisticInfo> getExchageStatisticInfos(String date) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("select tbl.*, ");
+		sb.append("select tbl.*, '");
 		sb.append(date);
-		sb.append("  as createDate");
+		sb.append("' as createDate");
 		sb.append("  from (");
 		sb.append("		select");
 		sb.append("   	   count(*) as count, agentid as agentId, routeid as routeId, success");
 		sb.append("  	  from BIZFRAME_CAMEL_FINISHED_EXCHANGE");
-		sb.append("      where date(CREATED) = :date");
+		sb.append("      where date(CREATED) = ?1 ");
 		sb.append("   		group by agentid, routeid, success");
 		sb.append(") as tbl");
 		String sql = sb.toString();
 
-		Session session = sessionFactory.getCurrentSession();
-		Query<ExchangeStatisticInfo> query = session.createSQLQuery(sql).
-				addEntity(ExchangeStatisticInfo.class)
-				.setParameter("date", date);
-		return query.list();
+		EntityManager session = emf.createEntityManager();
+		Query query = session.createNativeQuery(sql, ExchangeStatisticInfo.class).setParameter(1, date);
+		List<ExchangeStatisticInfo> list = query.getResultList();
+		session.close();
+		return list;
 	}
 }

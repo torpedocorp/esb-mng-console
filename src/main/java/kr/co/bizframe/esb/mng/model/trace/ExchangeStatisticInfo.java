@@ -2,27 +2,15 @@ package kr.co.bizframe.esb.mng.model.trace;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-@Entity
 public class ExchangeStatisticInfo implements Serializable {
 
 	private static final long serialVersionUID = 1636302096624195972L;
 
-	public long count;
-
-	@Id
+	public long count;	
 	public String agentId;
-
-	@Id
 	public String routeId;
-
-	@Id
-	public String createDate;
-	
-	@Id
 	public boolean success;
+	public String createDate;
 	
 	public long getCount() {
 		return count;

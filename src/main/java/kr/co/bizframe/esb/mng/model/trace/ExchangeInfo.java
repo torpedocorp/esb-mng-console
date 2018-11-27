@@ -3,21 +3,18 @@ package kr.co.bizframe.esb.mng.model.trace;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "BIZFRAME_CAMEL_FINISHED_EXCHANGE", indexes = {
-		@Index(columnList = "AGENTID", name = "IDX_FINISHED_EXCHANGE_AGENTID"),
-		@Index(columnList = "EXCHANGEID", name = "IDX_FINISHED_EXCHANGE_EXCHANGEID"),
-		@Index(columnList = "ROUTEID", name = "IDX_FINISHED_EXCHANGE_ROUTEID"),
-		@Index(columnList = "SUCCESS", name = "IDX_FINISHED_EXCHANGE_SUCCESS"),
-		@Index(columnList = "CREATED", name = "IDX_CREATED")})
+@Table(name = "BIZFRAME_CAMEL_FINISHED_EXCHANGE")
+@Access(AccessType.FIELD)
 public class ExchangeInfo {
 
 	@Id

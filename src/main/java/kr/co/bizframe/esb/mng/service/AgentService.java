@@ -1,12 +1,10 @@
 package kr.co.bizframe.esb.mng.service;
 import static kr.co.bizframe.esb.mng.type.Constants.CMD_APP_ID_PATTERN;
 import static kr.co.bizframe.esb.mng.type.Constants.CMD_STATUS_PATTERN;
-import static kr.co.bizframe.esb.mng.type.Constants.CONFIG_DB_KEY;
 import static kr.co.bizframe.esb.mng.type.Constants.FAIL;
 import static kr.co.bizframe.esb.mng.type.Constants.MAS_APP_ID_PATTERN;
 import static kr.co.bizframe.esb.mng.type.Constants.SUCCESS;
 import static kr.co.bizframe.esb.mng.type.Constants.TOTAL;
-import static kr.co.bizframe.esb.mng.type.Constants.TRANSACTIONMANAGER_NAME;
 import static kr.co.bizframe.esb.mng.utils.Strings.trim;
 import static kr.co.bizframe.esb.mng.utils.WebUtils.getRoutePrimaryKey;
 
@@ -45,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -127,7 +124,6 @@ public class AgentService {
 	}
 
 	private void initTodayExchangeInfo() {
-		// 디비에서 초기 데이터 가져옴
 		try {
 			List<ExchangeStatisticInfo> todayList = exchangeInfoDao.getExchageStatisticInfos(TimeUtil.getCurrentDateTime("yyyy-MM-dd"));
 			for (ExchangeStatisticInfo info : todayList) {
@@ -156,15 +152,12 @@ public class AgentService {
 
 						todayClear();
 
-					} catch (Throwable e) {
-						// 작동 중, 에러가 발생하여도 타이머는 계속 작동
+					} catch (Throwable e) {						
 						logger.error("Clear Today Infos error!", e);
 
-						// 한번 더 콜을 해줌 여기서도 에러가 나면....
 						try {
 							todayClear();
 						} catch (Throwable e1) {
-							// TODO 여긴..무시??? 에러가 안날때까지돌려야 하나?
 							logger.error("Clear Today Infos[2] error!", e);
 						}
 					}
@@ -586,7 +579,7 @@ public class AgentService {
 			isToInsert = true;
 		}
 		
-		// 기본 toList 작성				
+		// toList				
 		Map<String, List<String>> toRouteToList = to.getRouteToList();
 		toRouteToList.put(info.getToRouteId(), new ArrayList<String>());
 		to.setToList(gson.toJson(toRouteToList));
@@ -603,8 +596,6 @@ public class AgentService {
 		save(isToInsert, to);
 	}	
 
-	// TODO transaction rollback not working
-	@Transactional(transactionManager = CONFIG_DB_KEY + TRANSACTIONMANAGER_NAME)
 	public void save(boolean insert, Agent agent) {
 		if (insert) {
 			agentDao.save(agent);
@@ -635,7 +626,6 @@ public class AgentService {
 		return agentDao.list();
 	}
 
-	@Transactional(transactionManager = CONFIG_DB_KEY + TRANSACTIONMANAGER_NAME)
 	public void delete(String agentId, String routeId) {
 		Agent agent = get(agentId);
 		if (agent == null) {

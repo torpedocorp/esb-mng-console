@@ -8,10 +8,9 @@ import kr.co.bizframe.esb.mng.model.trace.TraceMessage;
 
 public interface MessageService {
 
-   String save(TraceMessage msg);
-   TraceMessage get(String id);
-   PagingModel<TraceMessage> paging(SearchOptions options);
-   List<TraceMessage> exchangeTraces(SearchOptions options);
-   void update(String id, TraceMessage msg);
-   void delete(String id);
+	TraceMessage get(String id);
+
+	PagingModel<TraceMessage> paging(SearchOptions options);
+
+	List<TraceMessage> exchangeTraces(SearchOptions options);
 }
