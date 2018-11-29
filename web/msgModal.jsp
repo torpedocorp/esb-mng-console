@@ -1,3 +1,4 @@
+<%
 /*                                                                              
  * Copyright 2018 Torpedo corp.                                                 
  *                                                                              
@@ -13,7 +14,7 @@
  * License for the specific language governing permissions and limitations      
  * under the License.                                                           
  */ 
-
+ %>
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>
         <div id="msgModal" class="uk-modal" aria-hidden="true" style="display: none; overflow-y: scroll;">
  			<div class="uk-modal-dialog trace-msg-dialog uk-overflow-auto">

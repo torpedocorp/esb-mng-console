@@ -1,3 +1,4 @@
+<%
 /*                                                                              
  * Copyright 2018 Torpedo corp.                                                 
  *                                                                              
@@ -13,7 +14,7 @@
  * License for the specific language governing permissions and limitations      
  * under the License.                                                           
  */ 
-
+ %>
 <%@page import="java.net.InetAddress"%>
 <%@page import="kr.co.bizframe.esb.mng.type.Constants"%>
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>

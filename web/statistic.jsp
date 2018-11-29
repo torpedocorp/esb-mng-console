@@ -1,3 +1,4 @@
+<%
 /*                                                                              
  * Copyright 2018 Torpedo corp.                                                 
  *                                                                              
@@ -13,7 +14,7 @@
  * License for the specific language governing permissions and limitations      
  * under the License.                                                           
  */ 
-
+ %>
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>
 <%@ include file="logincheck.jsp"%>
 <!DOCTYPE html>
